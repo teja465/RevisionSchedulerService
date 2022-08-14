@@ -54,7 +54,6 @@ public class AppUserServiceImpl implements AppUserService{
             return null;
         }
         log.info("Saving role {}",role.getName());
-
         return roleRepo.save(role);
     }
 
@@ -109,10 +108,7 @@ public class AppUserServiceImpl implements AppUserService{
         }
         catch (InvalidParameterException e){
             throw new InvalidParameterException(e.getLocalizedMessage());
-
         }
-
-
 
         return appUserRepo.save(UpdatedUser);
     }

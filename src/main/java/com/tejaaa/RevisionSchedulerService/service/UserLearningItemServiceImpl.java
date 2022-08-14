@@ -66,11 +66,7 @@ public class UserLearningItemServiceImpl implements UserLearningItemService{
                     user.getUsername(),userLearningItem.getTitle());
             throw new ItemAlreadyPresentException(message);
         }
-        // If schedule pattern in use profile is null return exception
-        // validate schedule pattern
-        //
-        // create entry in db;
-        //Create schedules for revision based on user schedule pattern and insert them in db;
+
         RevisionSchedulerUtil.validateUserProfileRevisionPattern(user);
         Collection<Long> revisionSchedule = RevisionSchedulerUtil.getFormattedRevisionSchedule(
                 user.getUserProfile().getRevisionPattern());
@@ -86,18 +82,15 @@ public class UserLearningItemServiceImpl implements UserLearningItemService{
         List<UserLearningRevisionSchedule> schedules = new ArrayList<UserLearningRevisionSchedule>();
 
         for (Long days:revisionSchedule) {
-            //
             scheduleDate=scheduleDate.plusDays(days);
             revisionCount+=1;
             log.info("saving revision {}/{}",revisionCount,revisionSchedule.size());
             UserLearningRevisionSchedule schedule = new UserLearningRevisionSchedule(null,userLearningItem.getId(),
                     revisionCount,scheduleDate,LocalDate.now(),null);
-//            userLearningRevisionScheduleRepo.save(schedule);
             schedules.add(schedule);
         }
         userLearningItem.setRevisionSchedules(schedules);
         return userLearningItem;
-
     }
 
     @Override
