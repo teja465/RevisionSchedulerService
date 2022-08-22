@@ -31,10 +31,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils = new JwtUtils();
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("User request url "+request.getRequestURI());
+        log.info("CustomAuthorizationFilter : User request url {}",request.getRequestURI());
         if (request.getRequestURI().contains("/api/login")){
-            //user is trying to login, skip this filter
             log.info("user is trying to login, skip this filter");
+            filterChain.doFilter(request,response);
+        }
+        else if (request.getRequestURI().contains("/api/signup")){
+            log.info("user is trying to signup, skip this filter");
             filterChain.doFilter(request,response);
         }
         else {
