@@ -28,6 +28,7 @@ public class UserController {
     public ResponseEntity<List<AppUser>> getAllUsers(){
         return ResponseEntity.ok(userService.getUsers());
     }
+    @CrossOrigin
     @PostMapping("/signup")
     public ResponseEntity<AppUser> signUp(@RequestBody AppUser user) throws ItemAlreadyPresentException {
         log.info("Signing  up user :{} ",user.getUsername());
