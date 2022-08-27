@@ -10,6 +10,7 @@ import com.tejaaa.RevisionSchedulerService.repository.AppUserRepo;
 import com.tejaaa.RevisionSchedulerService.repository.UserLearningRepo;
 import com.tejaaa.RevisionSchedulerService.repository.UserLearningRevisionScheduleRepo;
 import com.tejaaa.RevisionSchedulerService.utils.RevisionSchedulerUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,7 +61,9 @@ public class UserLearningItemServiceImpl implements UserLearningItemService{
 
         AppUser user = appUserRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         userLearningItem.setUsername(user.getUsername());
-        log.info("saveUserLearningItem for user ,{}",user.getUsername());
+        userLearningItem.setCreatedOn(LocalDate.now());
+        log.info("saveUserLearningItem for user ,{} , item : {} ,setCreatedOn {}",user.getUsername(),
+                userLearningItem.getCreatedOn(),userLearningItem.getCreatedOn());
         if(userLearningRepo.findByUsernameAndTitle(user.getUsername(),userLearningItem.getTitle()) != null){
 
             log.warn("userLearningItem with username {} and title {} already present",
