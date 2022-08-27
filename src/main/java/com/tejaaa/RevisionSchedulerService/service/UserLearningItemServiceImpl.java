@@ -38,8 +38,11 @@ public class UserLearningItemServiceImpl implements UserLearningItemService{
 
     @Override
     public List<UserLearningItem> getAllUserLearningItems() {
-        log.info("fetching all UserLearningItem's");
-        List<UserLearningItem> response =  userLearningRepo.findAll();
+        AppUser user = appUserRepo.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        log.info("fetching all UserLearningItem's of user {}",user.getUsername());
+
+
+        List<UserLearningItem> response = (List<UserLearningItem>) userLearningRepo.findByUsername(user.getUsername());
         return response;
     }
 

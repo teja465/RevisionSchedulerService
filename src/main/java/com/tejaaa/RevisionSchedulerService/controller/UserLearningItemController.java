@@ -1,5 +1,6 @@
 package com.tejaaa.RevisionSchedulerService.controller;
 
+import com.tejaaa.RevisionSchedulerService.entitys.AppUser;
 import com.tejaaa.RevisionSchedulerService.entitys.UserLearningItem;
 import com.tejaaa.RevisionSchedulerService.exceptions.InvalidParameterException;
 import com.tejaaa.RevisionSchedulerService.exceptions.ItemAlreadyPresentException;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
