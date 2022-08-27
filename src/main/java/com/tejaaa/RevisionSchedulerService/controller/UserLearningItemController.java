@@ -29,6 +29,7 @@ public class UserLearningItemController {
     @Autowired
     private UserLearningItemService userLearningItemService;
 
+    @CrossOrigin
     @Transactional
     @GetMapping("/user-learning-item")
     public ResponseEntity<List<UserLearningItem>> getAllUserLearningItems(){
