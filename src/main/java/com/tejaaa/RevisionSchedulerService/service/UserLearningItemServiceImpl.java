@@ -72,12 +72,16 @@ public class UserLearningItemServiceImpl implements UserLearningItemService{
                     user.getUsername(),userLearningItem.getTitle());
             throw new ItemAlreadyPresentException(message);
         }
+        else {
+            log.info("learning item doesnt exists in db {}",userLearningItem);
+        }
 
+        // verify user has valid profile with learning schedule configured.This is mandatory for scheduling revisions
         RevisionSchedulerUtil.validateUserProfileRevisionPattern(user);
         Collection<Long> revisionSchedule = RevisionSchedulerUtil.getFormattedRevisionSchedule(
                 user.getUserProfile().getRevisionPattern());
 
-        log.info(" Saving userLearningItem with username {} and title {} ",
+        log.info(" Saving new userLearningItem with username {} and title {} ",
                 userLearningItem.getUsername(),userLearningItem.getTitle());
 
             userLearningItem = userLearningRepo.save(userLearningItem);

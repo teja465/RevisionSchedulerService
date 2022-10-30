@@ -109,6 +109,10 @@ public class AppUserServiceImpl implements AppUserService{
         catch (InvalidParameterException e){
             throw new InvalidParameterException(e.getLocalizedMessage());
         }
+        catch (NumberFormatException e){
+            log.error("Exception while verifying user revision patttern {}",e);
+            throw new NumberFormatException(e.getMessage());
+        }
 
         return appUserRepo.save(UpdatedUser);
     }

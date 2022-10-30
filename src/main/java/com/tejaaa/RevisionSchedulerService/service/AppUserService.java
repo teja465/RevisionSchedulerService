@@ -18,7 +18,7 @@ public interface AppUserService extends UserDetailsService {
     List<AppUser> getUsers();
     List<Role> getRoles();
 
-    AppUser updateUserProfile(AppUser user) throws ItemNotPresentException, InvalidParameterException;
+    AppUser updateUserProfile(AppUser user) throws ItemNotPresentException, InvalidParameterException,NumberFormatException;
 
 
 }

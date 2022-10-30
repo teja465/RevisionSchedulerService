@@ -52,6 +52,7 @@ public class UserLearningItemController {
         return ResponseEntity.ok(item);
     }
 
+    @CrossOrigin
     @PostMapping(USER_LEARNING_ITEM_SAVE)
     public ResponseEntity<UserLearningItem> createUserLearningItem( @RequestBody UserLearningItem userLearningItem)
             throws InvalidParameterException, ItemAlreadyPresentException, URISyntaxException {
@@ -67,11 +68,17 @@ public class UserLearningItemController {
                     itemAlreadyPresentException.getMessage());
         }
         catch (InvalidParameterException invalidParameterException){
+            log.info("[UserLearningItemController] Exception while saving learning item {} of user {}",userLearningItem.getTitle(),userLearningItem.getUsername());
+            log.info("Exception {}",invalidParameterException);
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                     invalidParameterException.getMessage());
         }
+        catch (Exception e){
+            log.info("Exception while saving user learing item ",e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR , e.getMessage());
+        }
+        log.info("Saved user learning item {} of use {}",userLearningItem.getTitle() , userLearningItem.getTitle());
         URI uri  = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api"+USER_LEARNING_ITEM_SAVE).toUriString());
         return ResponseEntity.created(uri).body(responseItem);
     }
-
 }

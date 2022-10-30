@@ -44,15 +44,19 @@ public class UserController {
         return ResponseEntity.created(uri).body(userResponse);
     }
 
-    @PutMapping("/update-user-profile")
+    @CrossOrigin
+    @PostMapping("/update-user-profile")
     public ResponseEntity<AppUser> updateUserProfile(@RequestBody AppUser user)
             throws ItemNotPresentException, InvalidParameterException {
         log.info("Update user profile request for user {}",user.getUsername());
-        log.info("user {} ; userprofile {}",user,user.getUserProfile());
+        log.info("userprofile {}",user.getUserProfile());
         try{
             AppUser userResponse = userService.updateUserProfile(user);
         }
         catch (InvalidParameterException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+        }
+        catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
         }
 

@@ -24,18 +24,28 @@ public  class RevisionSchedulerUtil {
         }
     }
 
-    public static Collection<Long> getFormattedRevisionSchedule(String pattern){
+    public static Collection<Long> getFormattedRevisionSchedule(String pattern)  {
         Preconditions.checkNotNull(pattern,"SchedulePattern is null");
         Collection<Long> scheduleDays = new ArrayList<>();
 
         if (pattern.length() == 0){
             return scheduleDays;
         }
-        scheduleDays= Arrays.stream(pattern.split(",")).map(Long::valueOf).collect(Collectors.toList());
-
+        try {
+            scheduleDays = Arrays.stream(pattern.split(",")).map(Long::valueOf).collect(Collectors.toList());
+            scheduleDays.stream().forEach(RevisionSchedulerUtil::validateNumber);
+        }
+        catch (NumberFormatException e){
+            throw new NumberFormatException(e.getMessage());
+        }
         return scheduleDays;
 
     }
+
+    private static void validateNumber(Long num) throws NumberFormatException {
+        if (num >= 365) throw new NumberFormatException("Each number  must be < 365 :"+num);
+    }
+
 
     @Test
       public void  test(){
