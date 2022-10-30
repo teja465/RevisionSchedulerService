@@ -79,7 +79,11 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public AppUser getUser(String username) {
-        return appUserRepo.findByUsername(username);
+        AppUser user =  appUserRepo.findByUsername(username);
+        if(user !=null) {
+            user.setPassword(null);
+        }
+        return user;
     }
 
     @Override
