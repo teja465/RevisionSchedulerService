@@ -53,7 +53,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         String username = request.getParameter("username");
         userName =username;
         String password = request.getParameter("password");
-        log.info("CustomAuthenticationFilter,Logging in user : Username {} ",username);
+        log.info("CustomAuthenticationFilter,Logging in user : Username {} password {} ",username,password);
 
         if ((username == null) || (password == null)){
             String message="Username or password is null";
@@ -63,7 +63,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             return null;
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,password);
-        log.info("Got token");
+        log.info("Got token {}",token);
         log.info("user auth status is {} ",token.isAuthenticated());
         Authentication auth =  authenticationManager.authenticate(token);
         log.info("details {}",auth);

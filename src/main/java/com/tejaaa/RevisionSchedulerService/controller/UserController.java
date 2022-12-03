@@ -88,25 +88,31 @@ public class UserController {
         log.info("VALIDATE_USER request ");
         AppUser user = userService.getUser(userEmail);
         if (user == null){
-            return ResponseEntity.ok(String.format("User %s not found ",userEmail));
+            String msg = String.format("User %s not found ",userEmail);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(msg);
         }
         if (user.isEnabled()){
-            return ResponseEntity.ok(String.format("User %s is already enabled ",userEmail));
+            String msg = String.format("User %s is already enabled ",userEmail);
+            return ResponseEntity.ok(msg);
         }
         if (!user.getUserToken().getToken().equals(otp.trim())){
-            return ResponseEntity.ok(String.format("otp %s submitted for user %s  is invalid.Please enter correct otp "
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(String.format("otp %s submitted for user %s  is invalid.Please enter correct otp "
                     ,otp,userEmail));
         }
 
         // check is token expired .Mark as expired if token is >1day old
         if( !UserValidations.isUserTokenOlderThanN(user.getUserToken().getCreatedOn(), Constants.DAY_IN_SECONDS)){
-            return ResponseEntity.ok(String.format("otp %s submitted for user %s  is Expired." +
+            return  ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(String.format("otp %s submitted for user %s  is Expired." +
                      "Please enter signup to generate new  otp "
                     , otp,userEmail));
         }
-        userService.enableUser(userEmail,true);
-        log.info("Enabled user {}",userEmail);
+        userService.enableUser(user,true);
         return ResponseEntity.ok(String.format("Enabled user %s",userEmail));
-
     }
 }

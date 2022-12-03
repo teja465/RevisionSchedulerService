@@ -71,6 +71,8 @@ public class AppUserServiceImpl implements AppUserService{
         emailService.sendPlainTextEmail(user.getUsername(),"Signup otp","please use  "+token+"  to signup ");
 
         log.info("Saving user {} ",user.getUsername());
+        log.info("Saving user pass {} ", bCryptPasswordEncoder.encode(user.getPassword()));
+
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return appUserRepo.save(user);
     }
@@ -108,9 +110,9 @@ public class AppUserServiceImpl implements AppUserService{
     @Override
     public AppUser getUser(String username) {
         AppUser user =  appUserRepo.findByUsername(username);
-        if(user !=null) {
-            user.setPassword(null);
-        }
+//        if(user !=null) {
+//            user.setPassword(null);
+//        }
         return user;
     }
 
@@ -127,7 +129,7 @@ public class AppUserServiceImpl implements AppUserService{
     @Override
     public AppUser updateUserProfile(AppUser user) throws ItemNotPresentException, InvalidParameterException {
         AppUser prevUser = appUserRepo.findByUsername(user.getUsername());
-        if (prevUser !=null){
+        if (prevUser ==null){
             String exceptionMessage = String.format("User  '%s'  not found to update ",user.getUsername());
             log.warn(exceptionMessage);
             throw new ItemNotPresentException(exceptionMessage);
@@ -172,9 +174,10 @@ public class AppUserServiceImpl implements AppUserService{
         return  user1;
     }
     @Override
-    public void enableUser(String username, boolean userState){
-        AppUser user = appUserRepo.findByUsername(username);
+    public void enableUser(AppUser user, boolean userState){
         user.setEnabled(userState);
         appUserRepo.save(user);
+        log.info("saving user {}",user);
+        log.info("Enabled user {} , {}",user.getUsername(),appUserRepo.findByUsername(user.getUsername()).isEnabled());
     }
 }
