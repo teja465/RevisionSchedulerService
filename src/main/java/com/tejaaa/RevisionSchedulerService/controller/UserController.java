@@ -66,7 +66,10 @@ public class UserController {
     @CrossOrigin
     @GetMapping("/get-user-profile/{userEmail}")
     public ResponseEntity<AppUser> getUserProfile( @PathVariable String userEmail){
+        log.info("Fetching user profile for email {}",userEmail);
         AppUser user = userService.getUser(userEmail);
+        log.info(" user profile for use  {} is {}",userEmail,user);
+
         if (user == null){
             log.info("No user found with user email {}",userEmail);
             throw new  ResponseStatusException(HttpStatus.NOT_FOUND,"User with email "+userEmail+" not found");

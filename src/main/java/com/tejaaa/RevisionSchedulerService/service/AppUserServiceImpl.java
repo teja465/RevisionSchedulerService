@@ -2,6 +2,7 @@ package com.tejaaa.RevisionSchedulerService.service;
 
 import com.tejaaa.RevisionSchedulerService.entitys.AppUser;
 import com.tejaaa.RevisionSchedulerService.entitys.Role;
+import com.tejaaa.RevisionSchedulerService.entitys.UserToken;
 import com.tejaaa.RevisionSchedulerService.exceptions.InvalidParameterException;
 import com.tejaaa.RevisionSchedulerService.exceptions.ItemAlreadyPresentException;
 import com.tejaaa.RevisionSchedulerService.exceptions.ItemNotPresentException;
@@ -27,11 +28,16 @@ import java.util.List;
 @Slf4j
 public class AppUserServiceImpl implements AppUserService{
 
+    private final int USER_TOKEN_LENGTH=5;
+    private final long DAY_IN_SECS=24*60*60;
     @Autowired
     private AppUserRepo appUserRepo;
 
     @Autowired
     private RoleRepo roleRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
@@ -42,6 +48,19 @@ public class AppUserServiceImpl implements AppUserService{
             log.error(excpetionMessage);
             throw new ItemAlreadyPresentException(excpetionMessage);
         }
+
+        // create user token
+        String token = UserValidations.getRandomString(USER_TOKEN_LENGTH);
+        user.setEnabled(false);
+        UserToken userToken = new UserToken();
+        userToken.setToken(token);
+        userToken.setCreatedOn(System.currentTimeMillis()/1000);
+        userToken.setTokenValidtyTimePeriodInSeconds(DAY_IN_SECS);
+        user.setUserToken(userToken);
+
+        //send email with otp
+        emailService.sendPlainTextEmail(user.getUsername(),"Signup otp","please use  "+token+"  to signup ");
+
         log.info("Saving user {} ",user.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return appUserRepo.save(user);
@@ -103,7 +122,7 @@ public class AppUserServiceImpl implements AppUserService{
             log.warn(exceptionMessage);
             throw new ItemNotPresentException(exceptionMessage);
         }
-        log.info("Updating user {}",user.toString());
+        log.info("Updating user {} ",user.toString());
         AppUser UpdatedUser = appUserRepo.findByUsername(user.getUsername());
         UpdatedUser.setUserProfile(user.getUserProfile());
         try{
@@ -111,6 +130,8 @@ public class AppUserServiceImpl implements AppUserService{
                     user.getUserProfile().getRevisionPattern()));
         }
         catch (InvalidParameterException e){
+            log.error("InvalidParameterException while verifying user revision patttern {}",e);
+
             throw new InvalidParameterException(e.getLocalizedMessage());
         }
         catch (NumberFormatException e){
@@ -125,6 +146,10 @@ public class AppUserServiceImpl implements AppUserService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         AppUser user =  appUserRepo.findByUsername(username);
+//        if (!user.isEnabled() ){
+//            log.error("User with username {} not enabled ",username);
+//            throw new UsernameNotFoundException("user with username "+username+" not enabled ");
+//        }
         if (user == null) {
             log.error("User with username {} not found ",username);
             throw new UsernameNotFoundException("user with username "+username+" not found ");
@@ -133,7 +158,7 @@ public class AppUserServiceImpl implements AppUserService{
         List<SimpleGrantedAuthority> authorities =new ArrayList<SimpleGrantedAuthority>();
         user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
         User user1 = new User(user.getUsername(),user.getPassword(),authorities);
-        log.info("loadUserByUsername username is {}",user1.getUsername());
+        log.info("loadUserByUsername : fetched user is {}",user1);
         return  user1;
 
     }

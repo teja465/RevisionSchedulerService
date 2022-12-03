@@ -1,9 +1,11 @@
 package com.tejaaa.RevisionSchedulerService.entitys;
 
 import lombok.*;
+import org.junit.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +30,11 @@ public class AppUser  {
 
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<UserLearningItem> userLearningItems;
+
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private UserToken userToken;
+
+
 
 }
 //delete  from app_user_roles;

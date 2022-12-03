@@ -49,14 +49,17 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         if ((username == null) || (password == null)){
             String message="Username or password is null";
-            log.info(message);
+            log.info(" {} {} {}",message,username,password);
 
             response.getWriter().write(message);
+            return null;
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username,password);
         log.info("Got token");
         log.info("user auth status is {} ",token.isAuthenticated());
-        return authenticationManager.authenticate(token);
+        Authentication auth =  authenticationManager.authenticate(token);
+        log.info("details {}",auth);
+        return auth;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.tejaaa.RevisionSchedulerService.utils;
 
 import com.tejaaa.RevisionSchedulerService.exceptions.InvalidParameterException;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,5 +25,9 @@ public class UserValidations {
             String exceptionMessage = String.format("revision schedule pattern should not have repeating values .Pattern : %s",revisionSchedule.toString());
             throw new InvalidParameterException(exceptionMessage);
         }
+    }
+
+    public static String getRandomString(int length){
+        return RandomStringUtils.randomAlphabetic(length);
     }
 }

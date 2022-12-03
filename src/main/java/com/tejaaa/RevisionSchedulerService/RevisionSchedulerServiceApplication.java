@@ -6,6 +6,7 @@ import com.tejaaa.RevisionSchedulerService.entitys.UserProfile;
 import com.tejaaa.RevisionSchedulerService.service.AppUserService;
 import com.tejaaa.RevisionSchedulerService.service.UserLearningItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -24,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 @SpringBootApplication
 @EntityScan(basePackages = {"com.tejaaa.RevisionSchedulerService"})
@@ -35,6 +40,12 @@ public class RevisionSchedulerServiceApplication  implements CommandLineRunner {
 
 	@Autowired
 	private UserLearningItemService userLearningItemService;
+
+
+
+//	@Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+//	private String smtpTls;
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(RevisionSchedulerServiceApplication.class, args);
@@ -50,13 +61,18 @@ public class RevisionSchedulerServiceApplication  implements CommandLineRunner {
 //		UserLearningItem item = new UserLearningItem(null,"tejaaa@gmail.com","Spring Security architecture",
 //				"Learned spring  security architecture from www.spring.io", date,date,1,null);
 //		userLearningItemService.saveUserLearningItem(item);
+
+
+
+
 	}
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder(){
 		return new BCryptPasswordEncoder();
 	}
+
+
+
 }
-
-
 //select * from app_user;SELECT * FROM user_profile;
-// select * from user_learning_item;select * from user_learning_revision_schedules;
+//select * from user_learning_item;select * from user_learning_revision_schedules;
