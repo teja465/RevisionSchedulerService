@@ -41,7 +41,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/api/signup").permitAll()
+                . antMatchers("/api/signup" ,"/api/validate-user/**").permitAll()
                         .anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -53,8 +53,5 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return  super.authenticationManagerBean();
     }
-
-
-
 
     }

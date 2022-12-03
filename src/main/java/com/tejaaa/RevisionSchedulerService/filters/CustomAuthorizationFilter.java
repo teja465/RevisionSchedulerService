@@ -39,6 +39,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         else if (request.getRequestURI().contains("/api/signup")){
             log.info("user is trying to signup, skip this filter");
             filterChain.doFilter(request,response);
+        }else if (request.getRequestURI().contains("/api/validate-user")){
+            log.info("user is trying to validate otp " +
+                    ", skip this filter");
+            filterChain.doFilter(request,response);
+            return;
         }
         else {
             String authorizationHeader = request.getHeader("Authorization");

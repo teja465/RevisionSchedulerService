@@ -1,10 +1,13 @@
 package com.tejaaa.RevisionSchedulerService.controller;
 
+import com.tejaaa.RevisionSchedulerService.configs.Constants;
 import com.tejaaa.RevisionSchedulerService.entitys.AppUser;
 import com.tejaaa.RevisionSchedulerService.exceptions.InvalidParameterException;
 import com.tejaaa.RevisionSchedulerService.exceptions.ItemAlreadyPresentException;
 import com.tejaaa.RevisionSchedulerService.exceptions.ItemNotPresentException;
+import com.tejaaa.RevisionSchedulerService.repository.AppUserRepo;
 import com.tejaaa.RevisionSchedulerService.service.AppUserService;
+import com.tejaaa.RevisionSchedulerService.utils.UserValidations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -75,8 +78,35 @@ public class UserController {
             throw new  ResponseStatusException(HttpStatus.NOT_FOUND,"User with email "+userEmail+" not found");
         }
         return ResponseEntity.ok(user);
+    }
 
 
+    @CrossOrigin
+    @PostMapping("/validate-user")
+    public ResponseEntity<String> validateUserOTP(@RequestParam String userEmail ,@RequestParam String otp){
+
+        log.info("VALIDATE_USER request ");
+        AppUser user = userService.getUser(userEmail);
+        if (user == null){
+            return ResponseEntity.ok(String.format("User %s not found ",userEmail));
+        }
+        if (user.isEnabled()){
+            return ResponseEntity.ok(String.format("User %s is already enabled ",userEmail));
+        }
+        if (!user.getUserToken().getToken().equals(otp.trim())){
+            return ResponseEntity.ok(String.format("otp %s submitted for user %s  is invalid.Please enter correct otp "
+                    ,otp,userEmail));
+        }
+
+        // check is token expired .Mark as expired if token is >1day old
+        if( !UserValidations.isUserTokenOlderThanN(user.getUserToken().getCreatedOn(), Constants.DAY_IN_SECONDS)){
+            return ResponseEntity.ok(String.format("otp %s submitted for user %s  is Expired." +
+                     "Please enter signup to generate new  otp "
+                    , otp,userEmail));
+        }
+        userService.enableUser(userEmail,true);
+        log.info("Enabled user {}",userEmail);
+        return ResponseEntity.ok(String.format("Enabled user %s",userEmail));
 
     }
 }

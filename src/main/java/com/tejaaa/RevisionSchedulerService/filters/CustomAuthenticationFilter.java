@@ -3,11 +3,14 @@ package com.tejaaa.RevisionSchedulerService.filters;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.google.common.io.CharStreams;
+import com.tejaaa.RevisionSchedulerService.entitys.AppUser;
+import com.tejaaa.RevisionSchedulerService.service.AppUserService;
 import com.tejaaa.RevisionSchedulerService.utils.JwtUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +18,7 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,6 +41,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     private final JwtUtils jwtUtils = new JwtUtils();
 
+    private String userName;
+
+
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager){
         this.authenticationManager=authenticationManager;
     }
@@ -44,6 +51,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String username = request.getParameter("username");
+        userName =username;
         String password = request.getParameter("password");
         log.info("CustomAuthenticationFilter,Logging in user : Username {} ",username);
 
@@ -79,8 +87,18 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         JSONObject json =  new JSONObject(body);
         response.getWriter().write(json.toString());
         return;
+    }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException, ServletException {
+        log.info("in unsuccessfulAuthentication");
+        String msg = String.format("user %s is either disabled or not found in database",userName);
 
-
+        HashMap<String,String> body =new HashMap<>();
+        body.put("error",msg);
+        JSONObject json =  new JSONObject(body);
+        response.getWriter().write(json.toString());
+        return;
     }
 }

@@ -1,5 +1,6 @@
 package com.tejaaa.RevisionSchedulerService.utils;
 
+import com.tejaaa.RevisionSchedulerService.configs.Constants;
 import com.tejaaa.RevisionSchedulerService.exceptions.InvalidParameterException;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -29,5 +30,23 @@ public class UserValidations {
 
     public static String getRandomString(int length){
         return RandomStringUtils.randomAlphabetic(length);
+    }
+
+
+    /**
+     * @param creationDate
+     * @param validTimeInSeconds
+     * @return
+     * timeStamp in format System.currentTimeMillis()/1000;
+     * TODO:ADD docs
+     */
+    public static boolean isUserTokenOlderThanN(long creationDate,long validTimeInSeconds){
+
+        long currentTimeStamp = System.currentTimeMillis()/1000;
+        long diff = currentTimeStamp-creationDate;
+        if (diff <= Constants.DAY_IN_SECONDS){
+            return true;
+        }
+        return false;
     }
 }

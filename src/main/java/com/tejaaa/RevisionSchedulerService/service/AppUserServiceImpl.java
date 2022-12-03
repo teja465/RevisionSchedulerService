@@ -1,5 +1,6 @@
 package com.tejaaa.RevisionSchedulerService.service;
 
+import com.amazonaws.services.fms.model.App;
 import com.tejaaa.RevisionSchedulerService.entitys.AppUser;
 import com.tejaaa.RevisionSchedulerService.entitys.Role;
 import com.tejaaa.RevisionSchedulerService.entitys.UserToken;
@@ -43,10 +44,18 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public AppUser saveUser(AppUser user) throws ItemAlreadyPresentException {
-        if(appUserRepo.findByUsername(user.getUsername()) != null){
+        AppUser prevUser = appUserRepo.findByUsername(user.getUsername());
+        if(prevUser != null && prevUser.isEnabled() ==true){
             String excpetionMessage = String.format("user with username: '%s' already present ",user.getUsername());
             log.error(excpetionMessage);
             throw new ItemAlreadyPresentException(excpetionMessage);
+        }
+
+        if(prevUser != null && prevUser.isEnabled() == false){
+            String excpetionMessage = String.format("user with username: '%s' is not enabled .Deleting existing user ",user.getUsername());
+            log.info(excpetionMessage);
+            appUserRepo.delete(prevUser);
+//            throw new ItemAlreadyPresentException(excpetionMessage);
         }
 
         // create user token
@@ -117,7 +126,8 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public AppUser updateUserProfile(AppUser user) throws ItemNotPresentException, InvalidParameterException {
-        if (appUserRepo.findByUsername(user.getUsername()) == null){
+        AppUser prevUser = appUserRepo.findByUsername(user.getUsername());
+        if (prevUser !=null){
             String exceptionMessage = String.format("User  '%s'  not found to update ",user.getUsername());
             log.warn(exceptionMessage);
             throw new ItemNotPresentException(exceptionMessage);
@@ -146,13 +156,13 @@ public class AppUserServiceImpl implements AppUserService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         AppUser user =  appUserRepo.findByUsername(username);
-//        if (!user.isEnabled() ){
-//            log.error("User with username {} not enabled ",username);
-//            throw new UsernameNotFoundException("user with username "+username+" not enabled ");
-//        }
         if (user == null) {
             log.error("User with username {} not found ",username);
-            throw new UsernameNotFoundException("user with username "+username+" not found ");
+         }
+        if ( !user.isEnabled()){
+            String msg = String.format("User with username %s not enabled ",username);
+            log.info(msg);
+            throw new UsernameNotFoundException(msg);
         }
 
         List<SimpleGrantedAuthority> authorities =new ArrayList<SimpleGrantedAuthority>();
@@ -160,6 +170,11 @@ public class AppUserServiceImpl implements AppUserService{
         User user1 = new User(user.getUsername(),user.getPassword(),authorities);
         log.info("loadUserByUsername : fetched user is {}",user1);
         return  user1;
-
+    }
+    @Override
+    public void enableUser(String username, boolean userState){
+        AppUser user = appUserRepo.findByUsername(username);
+        user.setEnabled(userState);
+        appUserRepo.save(user);
     }
 }
